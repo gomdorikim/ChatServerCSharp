@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Client;
 
-namespace Server.Packets
+namespace Client.Packets
 {
     public class GlobalMessagePacket : Packet
     {

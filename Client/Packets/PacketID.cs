@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Server.Packets
+namespace Client.Packets
 {
     public enum PacketID : byte
     {

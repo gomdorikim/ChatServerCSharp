@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.IO;
 using System.Net.Sockets;
-using Server.Packets;
+using Client.Packets;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -14,29 +14,48 @@ namespace Client
 {
     public static class Network
     {
-        static Socket sck;
+        public static TcpClient tcpclient;
+        //public static Socket socket;
+        public static NetworkStream stream;
+        public static ListBox ChatBox;
         public static void Disconnect()
         {
-            sck.Disconnect(true);
-            sck.Close();
-            sck.Dispose();
+            stream.Dispose();
+            stream.Close();
         }
-        public static void Connect(string ip, int port, string username)
+        public static void Connect(string ip, int port, string username, ListBox chatbox)
         {
+            ChatBox = chatbox;
             int uid = 0;
             byte[] data = Encoding.ASCII.GetBytes(username);
             foreach (byte b in data) { uid += b; }
-            sck = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            sck.Connect(ip, port);
             ip.Replace("localhost", "127.0.0.1");
-            IPAddress ipa = Dns.GetHostEntry(ip).AddressList[0].ToString().Contains(".") ? Dns.GetHostEntry(ip).AddressList[0] : Dns.GetHostEntry(ip).AddressList[1];
-            sck.Bind(new IPEndPoint(ipa, port));
-            
-            sck.Listen(10);
-            sck.BeginAccept(callback, null);
-            ReceivedData += new ReceivedDataHandler(PacketSender);
+            ip = Dns.GetHostEntry(ip).AddressList[0].ToString().Contains(".") ? Dns.GetHostEntry(ip).AddressList[0].ToString() : Dns.GetHostEntry(ip).AddressList[1].ToString();
+            IPAddress ipa = IPAddress.Parse(ip);
+            EndPoint ipep = new IPEndPoint(ipa, port);
+            tcpclient = new TcpClient(ip, port);
+            //stream = new NetworkStream(socket);
+            stream = tcpclient.GetStream();
+
+            Thread listen = new Thread(new ThreadStart(Listen));
+            listen.Start();
+
             //while (!sck.Connected) { Thread.Sleep(250); }
             SendPacket(new LoginPacket(uid).Make());
+        }
+        static void Listen()
+        {
+            byte[] instream = new byte[8192];
+            //int readlength = (int)socket.ReceiveBufferSize;
+            int readlength = (int)tcpclient.ReceiveBufferSize;
+            stream.Read(instream, 0, readlength);
+            Array.Resize<byte>(ref instream, readlength);
+            Handle(instream);
+        }
+        static void Handle(byte[] data)
+        {
+            MemoryStream stream = new MemoryStream(data);
+            Packet.GetPacketByID((byte)stream.ReadByte()).Receive(stream);
         }
         static void PacketSender(byte[] data)
         {
@@ -47,36 +66,20 @@ namespace Client
                 Packet.GetPacketByID(b).Receive(stream);
             }
         }
-        static void callback(IAsyncResult ar)
-        {
-            while (true)
-            {
-                sck.EndAccept(ar);
-                while (sck.Available < 1) { Thread.Sleep(100); }
-                byte[] buf = new byte[16384];
-                int rec = sck.Receive(buf, buf.Length, 0);
-                if (rec < buf.Length)
-                {
-                    Array.Resize<byte>(ref buf, rec);
-                }
-                if (ReceivedData != null)
-                {
-                    ReceivedData(buf);
-                }
-                sck.BeginAccept(callback, null);
-            }
-        }
         public static void SendPacket(Packet packet)
         {
-            sck.Send(packet.Payload);
+            string s = "";
+            foreach (byte b in packet.Payload) { s += b.ToString() + "-"; }
+            File.AppendAllText("Log.txt", s + "\r\n\r\n");
+            //if (packet == null) { GetChat("null packet...?"); return; }
+            stream.Write(packet.Payload, 0, packet.Payload.Length);
         }
         public static void GetChat(string message)
         {
-            ReceivedChat(message);
+            ChatBox.Invoke((MethodInvoker)delegate
+            {
+                ChatBox.Items.Add(message);
+            });
         }
-        public delegate void ReceivedChatHandler(string message);
-        public delegate void ReceivedDataHandler(byte[] data);
-        public static event ReceivedDataHandler ReceivedData;
-        public static event ReceivedChatHandler ReceivedChat;
     }
 }

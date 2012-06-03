@@ -6,15 +6,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Client;
 
-namespace Server.Packets
+namespace Client.Packets
 {
     public class PingPacket : Packet
     {
         private string pingkey { get; set; }
-        public PingPacket(string pingkey)
+        public PingPacket()
         {
-            this.pingkey = pingkey;
-            Payload = new byte[65];
+            this.pingkey = RandomString(64);
+            Payload = new byte[0];
         }
         public override byte id
         {
@@ -25,7 +25,7 @@ namespace Server.Packets
             Network.GetChat("Received a ping");
             byte[] bytes = new byte[64];
             data.Read(bytes, 0, 64);
-            Network.SendPacket(new PingPacket(Encoding.ASCII.GetString(bytes)).Make());
+            Network.SendPacket(new PingPacket().Make());
         }
         public override Packet Make()
         {

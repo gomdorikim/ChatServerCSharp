@@ -275,11 +275,11 @@ namespace Server.Packets
         };
         public void AddPayLoad(byte b)
         {
-            Payload.Concat(new byte[] { b });
+            Payload = Payload.Concat(new byte[] { b }).ToArray();
         }
         public void AddPayLoad(byte[] bytes)
         {
-            Payload.Concat(bytes);
+            Payload = Payload.Concat(bytes).ToArray();
         }
 
         public static Packet GetPacketByID(PacketID packetid)

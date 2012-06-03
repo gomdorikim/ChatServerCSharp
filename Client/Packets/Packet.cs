@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Client.Packets;
 
-namespace Server.Packets
+namespace Client.Packets
 {
     public abstract class Packet
     {
@@ -275,11 +275,11 @@ namespace Server.Packets
         };
         public void AddPayLoad(byte b)
         {
-            Payload.Concat(new byte[] { b });
+            Payload = Payload.Concat(new byte[] { b }).ToArray();
         }
         public void AddPayLoad(byte[] bytes)
         {
-            Payload.Concat(bytes);
+            Payload = Payload.Concat(bytes).ToArray();
         }
 
         public static Packet GetPacketByID(PacketID packetid)
@@ -289,6 +289,7 @@ namespace Server.Packets
 
         public static Packet GetPacketByID(byte packetid)
         {
+            Console.WriteLine("Tried creating packet: " + packetid);
             return (Packet)Activator.CreateInstance((Packets[(byte)packetid]));
         }
         public static string RandomString(int size)

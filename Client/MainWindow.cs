@@ -19,19 +19,21 @@ namespace Client
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            Network.Connect(txtIP.Text, (int)numPort.Value, txtUsername.Text);
+            Network.Connect(txtIP.Text, (int)numPort.Value, txtUsername.Text, lstChat);
             //Network.Connect("127.0.0.1", 40000, "Wouto1997");
-            Network.ReceivedChat += new Network.ReceivedChatHandler(Network_ReceivedChat);
         }
 
-        void Network_ReceivedChat(string message)
+        public void Network_ReceivedChat(object sender, string message)
         {
-            lstChat.Items.Add(message);
+            Invoke((MethodInvoker)delegate
+            {
+                lstChat.Items.Add(message);
+            });
         }
 
         private void btnSendChat_Click(object sender, EventArgs e)
         {
-            Network.SendPacket(new Server.Packets.ChatMessagePacket(txtChat.Text, false).Make());
+            Network.SendPacket(new Client.Packets.ChatMessagePacket(txtChat.Text, false).Make());
         }
 
         private void MainWindow_Load(object sender, EventArgs e)

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Client;
 
-namespace Server.Packets
+namespace Client.Packets
 {
     public class KickPacket : Packet
     {
@@ -26,6 +26,7 @@ namespace Server.Packets
         }
         public override Packet Make()
         {
+            Network.GetChat("Sent a 255 (KICK)");
             AddPayLoad(255);
             return this;
         }

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Client;
 
-namespace Server.Packets
+namespace Client.Packets
 {
     public class LoginPacket : Packet
     {
@@ -14,7 +14,7 @@ namespace Server.Packets
         public LoginPacket(int UserID)
         {
             this.UserID = UserID;
-            Payload = new byte[37];
+            Payload = new byte[0];
         }
         public override byte id
         {
@@ -36,6 +36,7 @@ namespace Server.Packets
             AddPayLoad(1);
             AddPayLoad(WriteInt(UserID));
             AddPayLoad(WriteString(RandomString(32)));
+            Network.GetChat("Wrote LoginPacket");
             return this;
         }
     }
