@@ -34,7 +34,7 @@ namespace Server.Packets
             typeof(InvalidPacket), // 15
             typeof(GlobalMessagePacket), // 16
             typeof(ChatMessagePacket), // 17
-            typeof(InvalidPacket), // 18
+            typeof(PrivateMessagePacket), // 18
             typeof(InvalidPacket), // 19
             typeof(InvalidPacket), // 20
             typeof(InvalidPacket), // 21
