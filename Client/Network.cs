@@ -14,7 +14,6 @@ namespace Client
 {
     public static class Network
     {
-        public static bool firstping = true;
         static Socket sck;
         public static void Disconnect()
         {
@@ -25,26 +24,25 @@ namespace Client
         public static void Connect(string ip, int port, string username)
         {
             int uid = 0;
-
+            byte[] data = Encoding.ASCII.GetBytes(username);
+            foreach (byte b in data) { uid += b; }
             sck = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             sck.Connect(ip, port);
+            sck.Bind(new IPEndPoint(Dns.Resolve(IPAddress.Any.ToString()).AddressList[0], port));
+            sck.Listen(10);
             sck.BeginAccept(callback, null);
             ReceivedData += new ReceivedDataHandler(PacketSender);
             //while (!sck.Connected) { Thread.Sleep(250); }
-            SendPacket(new LoginPacket()).Make());
+            SendPacket(new LoginPacket(uid).Make());
         }
         static void PacketSender(byte[] data)
         {
-
-        }
-        public static Packet GetPacketByID(PacketID packetid)
-        {
-            return (Packet)Activator.CreateInstance((Packets.Packets[(byte)packetid]));
-        }
-
-        public static Packet GetPacketByID(byte packetid)
-        {
-            return (Packet)Activator.CreateInstance((Packets.Packets[(byte)packetid]));
+            MemoryStream stream = new MemoryStream(data);
+            while (stream.Length > 0)
+            {
+                byte b = (byte)stream.ReadByte();
+                Packet.GetPacketByID(b).Receive(stream);
+            }
         }
         static void callback(IAsyncResult ar)
         {
