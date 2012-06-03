@@ -28,7 +28,10 @@ namespace Client
             foreach (byte b in data) { uid += b; }
             sck = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             sck.Connect(ip, port);
-            sck.Bind(new IPEndPoint(Dns.Resolve(IPAddress.Any.ToString()).AddressList[0], port));
+            ip.Replace("localhost", "127.0.0.1");
+            IPAddress ipa = Dns.GetHostEntry(ip).AddressList[0].ToString().Contains(".") ? Dns.GetHostEntry(ip).AddressList[0] : Dns.GetHostEntry(ip).AddressList[1];
+            sck.Bind(new IPEndPoint(ipa, port));
+            
             sck.Listen(10);
             sck.BeginAccept(callback, null);
             ReceivedData += new ReceivedDataHandler(PacketSender);
