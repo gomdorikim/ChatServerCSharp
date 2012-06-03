@@ -52,6 +52,7 @@
     <Compile Include="Packets\Packet.cs" />
     <Compile Include="Packets\PacketID.cs" />
     <Compile Include="Packets\PingPacket.cs" />
+    <Compile Include="Packets\PrivateMessagePacket.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server.cs" />

@@ -123,6 +123,7 @@
             this.txtChat.Name = "txtChat";
             this.txtChat.Size = new System.Drawing.Size(230, 20);
             this.txtChat.TabIndex = 8;
+            this.txtChat.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtChat_KeyDown);
             // 
             // btnSendChat
             // 

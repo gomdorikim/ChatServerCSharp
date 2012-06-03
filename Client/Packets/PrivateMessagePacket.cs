@@ -34,7 +34,7 @@ namespace Client.Packets
             int user = ReadInt(data);
             int length = ReadInt(data);
             string message = ReadString(data, length);
-            //Call GUI
+            Network.GetChat("<[Private Message] " + user.ToString() + ">:" + message); //Temp (probably)
         }
     }
 }

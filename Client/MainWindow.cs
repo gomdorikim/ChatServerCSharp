@@ -31,6 +31,14 @@ namespace Client
             });
         }
 
+        private void txtChat_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                btnSendChat_Click(sender, (EventArgs)e);
+            }
+        }
+
         private void btnSendChat_Click(object sender, EventArgs e)
         {
             Network.SendPacket(new Client.Packets.ChatMessagePacket(txtChat.Text, false).Make());
@@ -40,5 +48,7 @@ namespace Client
         {
 
         }
+
+        
     }
 }
